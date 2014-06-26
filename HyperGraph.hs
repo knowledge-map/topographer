@@ -28,7 +28,11 @@ instance Show a => Show (Graph a) where
         ++ "}"
 
 instance Show a => Show (HyperEdge a) where
-    show (HyperEdge n ns) = unlines $ map (\n' -> (show n) ++ " -> " ++ (show n')) $ Set.toList ns
+    show (HyperEdge n ns) = show n ++ " -> " ++ nodeSet ++ "\n"
+        ++ nodeSet ++ " -> " ++ show n ++ "\n"
+        -- ++ (unlines $ map (\n' -> nodeSet ++ " -> " ++ (show n')) $ Set.toList ns) ++ "\n" 
+        ++ nodeSet ++ "[label=\"\"]"
+        where nodeSet = concat $ map show $ Set.toList ns
 
 instance Show a => Show (Edge a) where
     show (Edge n n') = (show n) ++ " -> " ++ (show n')
@@ -67,8 +71,8 @@ partOfHyperEdge n he = n `Set.member` es
 main :: IO ()
 main = do
     --putStrLn "HyperGraph experiments"
-    --putStrLn $ show resourceHyperGraph
-    putStrLn $ show $ dag 
+    putStrLn $ show resourceHyperGraph
+    --putStrLn $ show $ dag 
     --print conceptResources
 
     where
