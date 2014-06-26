@@ -1,5 +1,27 @@
 module Concepts where
-concepts = [ "Mathematics"
+
+data Concept a = Concept a
+    deriving (Eq, Ord, Show)
+data Resource a = Resource a
+    deriving (Eq, Ord, Show)
+
+data ResourceMap a = ResourceMap MapDescription (Resource a) (Concept a)
+data MapDescription = Teaches | Requires | PartOf
+    deriving (Eq)
+
+
+teaches :: Resource a -> Concept a -> ResourceMap a
+teaches = ResourceMap Teaches
+
+requires :: Resource a -> Concept a -> ResourceMap a
+requires = ResourceMap Requires
+
+partOf :: Resource a -> Concept a -> ResourceMap a
+partOf = ResourceMap PartOf
+
+
+concepts = map Concept $
+           [ "Mathematics"
            , "Counting"
            , "Addition"
            , "Subtraction"
@@ -9,7 +31,8 @@ concepts = [ "Mathematics"
            , "Word problems"
            ]
 
-resources = [ "Counting with fingers"
+resources = map Resource $
+            [ "Counting with fingers"
             , "Counting to 100"
             , "Counting with the number line"
             , "Addition with fingers"
@@ -29,27 +52,51 @@ resources = [ "Counting with fingers"
             , "Maths Game III"
             ]
 
-resourceConcepts = zip resources
-    [ ["Mathematics", "Counting"]
-    , ["Mathematics", "Counting"]
-    , ["Mathematics", "Counting", "The number line"]
-    , ["Mathematics", "Counting", "Addition"]
-    , ["Mathematics", "Counting", "Addition", "The number line"]
-    , ["Mathematics", "Counting", "Subtraction"]
-    , ["Mathematics", "Counting", "Subtraction", "The number line"]
-    , ["Mathematics", "Counting", "Subtraction", "Word problems"]
-    , ["Mathematics", "Counting", "Addition", "Multiplication"]
-    , ["Mathematics", "Counting", "Subtraction", "Division"]
-    , ["Mathematics", "Division"]
-    , ["Mathematics", "Division", "Word problems"]
-    , ["Mathematics", "Counting", "Addition"]
-    , ["Mathematics", "Counting", "Addition", "Multiplication"]
-    , ["Mathematics", "Subtraction", "Word problems"]
-    , ["Mathematics", "Counting"]
-    , ["Mathematics", "Addition", "Subtraction"]
-    , ["Mathematics", "Multiplication", "Division"]
-    ] :: [(String, [String])]
+resourceMaps :: [ResourceMap String]
+resourceMaps = concat $
+    zipWith (each teaches) resources
+    [ ["Counting"]
+    , ["Counting"]
+    , ["Counting", "The number line"]
+    , ["Addition"]
+    , ["Addition", "The number line"]
+    , ["Subtraction"]
+    , ["Subtraction"]
+    , ["Subtraction"]
+    , ["Multiplication"]
+    , ["Division"]
+    , ["Division"]
+    , ["Division"]
+    , []
+    , ["Multiplication"]
+    , []
+    , []
+    , []
+    , []
+    ]
+    ++ zipWith (each requires) resources
+    [ []
+    , []
+    , []
+    , ["Counting"] 
+    , ["Counting"]
+    , ["Counting"]
+    , ["Counting", "The number line"]
+    , ["Counting", "Word problems"]
+    , ["Counting", "Addition"] 
+    , ["Counting", "Subtraction"]
+    , []
+    , ["Word problems"]
+    , ["Counting", "Addition"]
+    , ["Counting", "Addition"]
+    , ["Subtraction", "Word problems"] 
+    , ["Counting"]
+    , ["Addition", "Subtraction"]
+    , ["Multiplication", "Division"]
+    ]
+    ++ zipWith (each partOf) resources
+    (repeat ["Mathematics"])
 
-conceptResources = (zip concepts $
-    [ [ resource | (resource, cs) <- resourceConcepts, c `elem` cs ] | c <- concepts ]) :: [(String, [String])]
+    where
+        each f r cs = map (f r) (map Concept cs)
 
