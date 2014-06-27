@@ -7,9 +7,10 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/knowledge-map.css">
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
-    <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+    <script type="text/javascript" src="js/knowledge-map.js"></script>
 </head>
 
 <body>
@@ -20,70 +21,31 @@
 
     <script type="text/javascript" src="js/topographer.js"></script>
     <style>
-        .node {
-            cursor: pointer;
-        }
-
-        .node text {
-            cursor: pointer;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
-        .node text:hover {
-            fill: #88c;
-        }
-
-        .node circle {
-            stroke: #fff;
-            stroke-width: 1.5px;
-        }
-
-        .link {
-            stroke: #999;
-            stroke-opacity: .6;
-            stroke-width: 4px;
-        }
-
-        #arrow {
-            fill: #999;
-            fill-opacity: .6;
+        svg {
+            width: 1000px;
+            height: 800px;
         }
     </style>
     <script type="text/javascript">
-        var width = 960,
-            height = 600;
-
-        var color = d3.scale.category20();
-
-        var force = d3.layout.force()
-            .charge(-300)
-            .linkDistance(250)
-            .size([width, height]);
-
-        var svg = d3.select("figure").append("svg")
-            .attr("width", width)
-            .attr("height", height);
-
-        svg.append("defs").append("marker")
-            .attr("id", "arrow")
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 10)
-            .attr("refY", 0)
-            .attr("markerWidth", 6)
-            .attr("markerHeight", 6)
-            .attr("orient", "auto")
-            .append("path")
-                .attr("d", "M0,-5L10,0L0,5");
-        
-        Parse.Promise.when([getResources(), getConcepts(), getMaps()])
+         Parse.Promise.when([getResources(), getConcepts(), getMaps()])
         .then(function(resources, concepts, maps) {
-            var nodes = resources.concat(concepts);
-            var links = maps.map(function(map) {
+            var nodes = resources.concat(concepts).map(function(node) { 
+                return {
+                    id: node.id,
+                    name: node.get("name"),
+                    content: [{
+                        link: node.get("URL"),
+                        description: node.get("description"),
+                    }],
+                };
+            });
+
+            km = knowledgeMap.create({
+                graph: {concepts: nodes},
+                plugins: ['modals'],
+            });
+            
+            maps.forEach(function(map) {
                 var relationship = map.get("relationship").get("name");
                 var concept = concepts.find(function(concept) {
                     return concept.id === map.get("concept").id;
@@ -92,53 +54,15 @@
                     return resource.id === map.get("resource").id;
                 });
 
+                var dep;
+                console.log(concept, resource)
                 if (relationship === "teaches") {
-                    return {source: resource, target: concept};
+                    dep = {concept: concept.id, dependency: resource.id};
                 } else if (relationship === "requires") {
-                    return {source: concept, target: resource};
+                    dep = {concept: resource.id, dependency: concept.id};
                 }
-            });
 
-            force
-                .nodes(nodes)
-                .links(links)
-                .start();
-
-            var link = svg.selectAll(".link")
-                .data(links)
-              .enter().append("line")
-                .attr("class", "link")
-                .attr("marker-end", "url(#arrow)");
-
-            var node = svg.selectAll(".node")
-                .data(nodes)
-              .enter().append("g")
-                .attr("class", "node")
-                .call(force.drag);
-              
-              node.append("circle")
-                .attr("r", 10)
-                .style("fill", function(d) {
-                    return color(d.className);
-                });
-
-            node.append("title")
-                .text(function(d) { return d.get("name"); });
-            node.append("text")
-                .attr("dx", 15)
-                .attr("dy", 5)
-                .text(function(d) { return d.get("name"); })
-                .on('click', function(d) {
-                    window.location = "/view"+d.className+".html" + "?id="+d.id;
-                });
-
-            force.on("tick", function() {
-              link.attr("x1", function(d) { return d.source.x; })
-                  .attr("y1", function(d) { return d.source.y; })
-                  .attr("x2", function(d) { return d.target.x; })
-                  .attr("y2", function(d) { return d.target.y; });
-
-              node.attr("transform", function(d) { return "translate("+d.x+","+d.y+")"; });
+                km.addDependency(dep);
             });
         });
     </script>
