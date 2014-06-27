@@ -5,9 +5,14 @@
     <title>Knowledge Map - Edit Resource</title>
     <meta name="description" content="Knowledge Map">
     <meta name="viewport" content="width=device-width">
+
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tagit.css">
+    
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/tag-it.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 </head>
 
@@ -31,9 +36,30 @@
         </p>
 
         <p>
+            <label for="teaches">
+                Teaches
+            </label>
+            <input name="teaches" type="tags"></input>
+        </p>
+        <p>
+            <label for="requires">
+                Requires
+            </label>
+            <input name="requires" type="tags"></input>
+        </p>
+
+        <p>
             <input type="submit" value="Save"></input>
         </p>
     </form>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("input[type='tags']").tagit({
+                allowSpaces: true,
+            });
+        });
+    </script>
 
     <script type="text/javascript">
         Parse.initialize("HCqG8ipL0wyGCrMl60mKk1w9EqWTfmUl2k05pnJm", "GX0soAeJUyTHePsm83pcE95kydFz7y55mplHSd1A");
