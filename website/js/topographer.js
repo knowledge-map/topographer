@@ -90,6 +90,17 @@ function getConceptMaps(resource) {
     }
 }
 
+function getConceptRelationshipMaps(resource, relationshipName) {
+    var relationshipQuery = new Parse.Query(ConceptRelationship);
+    relationshipQuery.equalTo("name", relationshipName);
+
+    var query = new Parse.Query(ConceptMap);
+    query.equalTo("resource", resource);
+    query.matchesQuery("relationship", relationshipQuery);
+
+    return query.find();
+}
+
 function getRelationship(relationshipName) {
     var query = new Parse.Query(ConceptRelationship);
     query.equalTo("name", relationshipName)

@@ -49,6 +49,22 @@
             $(".resource-URL")
                 .attr("href", resource.get("URL"))
                 .html(resource.escape("URL"));
+
+            var relationshipNames = ["teaches", "requires"];
+            relationshipNames.forEach(function(relationshipName) {
+                var list = $(".resource-"+relationshipName);
+
+                getConceptRelationshipMaps(resource, relationshipName)
+                .then(function(maps) {
+                    maps.forEach(function(map) {
+                        map.get("concept").fetch()
+                        .then(function(concept) {
+                            var li = $('<li>').html(concept.get("name"));
+                            list.append(li);
+                        });
+                    });
+                });
+            });
         });
     </script>
 </body>
