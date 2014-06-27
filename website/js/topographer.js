@@ -73,9 +73,17 @@ function getResource(resourceId) {
     return query.get(resourceId);
 }
 
+function getResources() {
+    var query = new Parse.Query(Resource);
+
+    return query.find();
+}
+
 function getConcepts(conceptNames) {
     var query = new Parse.Query(Concept);
-    query.containedIn("name", conceptNames);
+    if (conceptNames) {
+        query.containedIn("name", conceptNames);
+    }
 
     return query.find();
 }
@@ -109,4 +117,11 @@ function getRelationship(relationshipName) {
         .then(function(relationships) {
             return relationships.length > 0 ? relationships[0] : null;
         });
+}
+
+function getMaps() {
+    var query = new Parse.Query(ConceptMap);
+    query.include("relationship");
+
+    return query.find()
 }
