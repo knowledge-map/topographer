@@ -1,0 +1,59 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+
+    <title>Knowledge Map - Edit Resource</title>
+    <meta name="description" content="Knowledge Map">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+</head>
+
+<body>
+    <h1>Knowledge Map</h1>
+
+    <h2>Edit a Resource</h2>
+
+    <form onSubmit="return saveResource(this)">
+        <p>
+            <label for="name">
+                Name
+            </label>
+            <input name="name"></input>
+        </p>
+        <p>
+            <label for="URL">
+                Link
+            </label>
+            <input name="URL"></input>
+        </p>
+
+        <p>
+            <input type="submit" value="Save"></input>
+        </p>
+    </form>
+
+    <script type="text/javascript">
+        Parse.initialize("HCqG8ipL0wyGCrMl60mKk1w9EqWTfmUl2k05pnJm", "GX0soAeJUyTHePsm83pcE95kydFz7y55mplHSd1A");
+
+        var Resource = Parse.Object.extend("Resource");
+
+        function saveResource(form) {
+            var resource = new Resource();
+
+            resource.save({
+                name: form.name.value,
+                URL: form.URL.value,
+            }, {
+                success: function() {console.log("success", arguments);},
+                error: function() {console.log("failure", arguments);}
+            });
+
+            return false;
+        }
+    </script>
+</body>
+
+</html>
