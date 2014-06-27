@@ -67,6 +67,12 @@ function saveMapping(resource, relationship, concept) {
     });
 }
 
+function getResource(resourceId) {
+    var query = new Parse.Query(Resource);
+
+    return query.get(resourceId);
+}
+
 function getConcepts(conceptNames) {
     var query = new Parse.Query(Concept);
     query.containedIn("name", conceptNames);
