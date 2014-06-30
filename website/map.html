@@ -35,6 +35,7 @@
                     id: node.id,
                     name: node.get("name"),
                     content: [{
+                        title: node.get("name"),
                         link: node.get("URL"),
                         description: node.get("description"),
                     }],
@@ -56,7 +57,6 @@
                 });
 
                 var dep;
-                console.log(concept, resource)
                 if (relationship === "teaches") {
                     dep = {concept: concept.id, dependency: resource.id};
                 } else if (relationship === "requires") {
